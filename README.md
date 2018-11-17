@@ -20,6 +20,9 @@ and press enter.
 
 Then double click the .reg file to change your powershell execution policy so you can run the powershell script.
 
+You can learn more about powershell execution policies here:
+https://www.tenforums.com/tutorials/54585-change-powershell-script-execution-policy-windows-10-a.html
+
 Then right click on "AddLibavToEnvVars.ps1" and choose "Run with PowerShell."  Don't worry about the windows that popup.  This adds libav to your system environment variables.
 
 Then you're good to go.  UE4 Audio Looper.py should always work now.
