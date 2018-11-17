@@ -1,13 +1,19 @@
 # ue4_audio_looper
 
+### Libav ###
+
 Put libav in the same directory referred to in the powershell script.  You can get it here if you don't have it:
 http://builds.libav.org/windows/
+
+### Python ###
 
 Install Python 3 64 bit from here:
 https://www.python.org/ftp/python/3.7.0/python-3.7.0-amd64.exe
 
 More info about that is here:
 https://www.python.org/downloads/release/python-370/
+
+### Directions ###
 
 Open file explorer.
 Press Alt + F + S + A in that order, not all at once.
