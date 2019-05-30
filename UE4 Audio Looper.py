@@ -1,12 +1,16 @@
 import tkinter as tk
 from tkinter import filedialog
 
-import pydub
-from pydub import AudioSegment
+import soundfile
+import numpy as np
 
 # variables you can change
-milliseconds_of_loop_to_append_to_intro = 1000 # 1000 milliseconds is one second
+seconds_of_loop_to_append_to_intro = 1.0
 # end of variables you can change; Don't touch anything below!
+
+"""
+Make sure that the two files you select have the same sample rate (you can view this in Adobe Audition)
+"""
 
 user_choice = "n"
 while user_choice != "y":
@@ -25,35 +29,26 @@ while user_choice != "y":
     quit()
 
 if(intro_filepath.endswith(".wav") and loop_filepath.endswith(".wav")):
-  intro = AudioSegment.from_wav(intro_filepath)
-  loop = AudioSegment.from_wav(loop_filepath)
+  intro, intro_samp = soundfile.read(intro_filepath)
+  loop, loop_samp = soundfile.read(loop_filepath)
 else:
   input("Error, selected files aren't .wavs! Press enter or click the X to exit...")
   quit()
-
-while intro.frame_count() >= loop.frame_count():
+ 
+while intro.shape[0] >= loop.shape[0]:
   print("Intro is too long, so doubled loop segment length (original loop .wav file is unchanged)!")
-  loop = loop.append(loop, crossfade=0)
+  loop = np.concatenate((loop, loop), axis=0) # https://stackoverflow.com/a/54389501
 
-loop_sample_array = loop.get_array_of_samples()
-if loop.channels == 1:
-  sample_cut_num = int(loop.frame_count()) - int(intro.frame_count())
-elif loop.channels == 2:
-  sample_cut_num = 2*(int(loop.frame_count()) - int(intro.frame_count()))
-else:
-  input("Error, looping segment has more than 2 channels! Press enter or click the X to exit...")
-  quit()
+sample_cut_num = loop.shape[0] - intro.shape[0]
 
-loop_samp_array_1 = loop_sample_array[:sample_cut_num]
-loop_samp_array_2 = loop_sample_array[sample_cut_num:]
+loop_segment_1 = loop[:sample_cut_num]
+loop_segment_2 = loop[sample_cut_num:]
 
-loop_segment_1 = loop._spawn(loop_samp_array_1)
-loop_segment_2 = loop._spawn(loop_samp_array_2)
+sample_cutoff = int(loop_samp*seconds_of_loop_to_append_to_intro) # calculate the sample number the loop (appeneded to the intro) ends at
+new_intro_segment = np.concatenate((intro, loop_segment_1[:sample_cutoff]), axis=0)
+new_loop_segment = np.concatenate((loop_segment_2, loop_segment_1), axis=0)
 
-new_intro_segment = intro + loop_segment_1[:milliseconds_of_loop_to_append_to_intro]
-new_loop_segment = loop_segment_2.append(loop_segment_1, crossfade=0)
-
-new_intro_segment.export(intro_filepath, format="wav")
-new_loop_segment.export(loop_filepath, format="wav")
+soundfile.write(intro_filepath, new_intro_segment, samplerate = intro_samp, format = "WAV")
+soundfile.write(loop_filepath, new_loop_segment, samplerate = loop_samp, format = "WAV")
 
 input("Press enter or click the X to continue...")
