@@ -9,7 +9,9 @@ seconds_of_loop_to_append_to_intro = 1.0
 # end of variables you can change; Don't touch anything below!
 
 """
-Make sure that the two files you select have the same sample rate (you can view this in Adobe Audition)
+Notes:
+The numpy arrays representing audio have channels on the x axis (shape[1]) and samples on the y axis (shape[0]).
+Make sure that the two files you select have the same sample rate (you can view this in Adobe Audition)! (I haven't tested what will happen if they are different.)
 """
 
 user_choice = "n"
